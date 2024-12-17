@@ -1,4 +1,38 @@
-p{
-    height: 1200px;
-    background-color: aquamarine;
+$transition: 500ms ease-in-out;
+
+@mixin transition($property: all) {
+  transition: $property $transition;
+}
+:host * {
+    @include transition;
+}
+mat-sidenav-container {
+  height: calc(100vh - 64px);
+  @include transition;
+
+  mat-sidenav {
+    @include transition;
+    mat-nav-list{
+        a{
+            border-left: 5px solid rgba(0,0,0,0);
+
+        }
+    }
+  }
+
+  mat-sidenav-content {
+    padding: 24px;
+  }
+}
+
+
+
+mat-toolbar{
+
+    position: relative;
+    z-index: 5;
+}
+.selected-menu-item{
+    border-left-color:  blue !important;
+    background: rgba(0,0,0,0.05);
 }

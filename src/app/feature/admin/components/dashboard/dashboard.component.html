@@ -1,1 +1,25 @@
-<p>dashboard works!</p>
+<mat-toolbar class="mat-elevation-z3">
+    <button mat-icon-button (click)="collapsed.set(!collapsed())">
+        <mat-icon>menu</mat-icon>
+    </button>
+</mat-toolbar>
+<mat-sidenav-container>
+    <mat-sidenav opened mode="side" [style.width]="sidenavWidth()">
+        <mat-nav-list>
+
+            @for (item of menuItems(); track item.route) {
+            <a mat-list-item [routerLink]="item.route" routerLinkActive="selected-menu-item" #rla="routerLinkActive"
+                [activated]="rla.isActive">
+                <mat-icon [fontSet]="rla.isActive ? 'material-icons' :'material-icons-outlined'"
+                    matListItemIcon>{{item.icon}}</mat-icon>
+                @if(!collapsed()){
+                <span matListItemTitel>{{item.label}}</span>
+                }
+            </a>
+            }
+        </mat-nav-list>
+    </mat-sidenav>
+    <mat-sidenav-content class="content" [style.margin-left]="sidenavWidth()">
+        <router-outlet />
+    </mat-sidenav-content>
+</mat-sidenav-container>

@@ -1,0 +1,44 @@
+<mat-card>
+    <form [formGroup]="userForm" (ngSubmit)="onSubmit()">
+      <mat-form-field appearance="fill">
+        <mat-label>User Type</mat-label>
+        <mat-select formControlName="userType">
+          <mat-option *ngFor="let type of userTypes" [value]="type">{{ type }}</mat-option>
+        </mat-select>
+      </mat-form-field>
+  
+      <mat-form-field appearance="fill">
+        <mat-label>Name</mat-label>
+        <input matInput formControlName="name" placeholder="Enter name">
+      </mat-form-field>
+  
+      <mat-form-field appearance="fill">
+        <mat-label>Email</mat-label>
+        <input matInput formControlName="email" placeholder="Enter email">
+      </mat-form-field>
+  
+      <div *ngIf="userForm.get('department')">
+        <mat-form-field appearance="fill">
+          <mat-label>Department</mat-label>
+          <input matInput formControlName="department" placeholder="Enter department">
+        </mat-form-field>
+      </div>
+  
+      <div *ngIf="userForm.get('course')">
+        <mat-form-field appearance="fill">
+          <mat-label>Course</mat-label>
+          <input matInput formControlName="course" placeholder="Enter course">
+        </mat-form-field>
+      </div>
+  
+      <div *ngIf="userForm.get('batch')">
+        <mat-form-field appearance="fill">
+          <mat-label>Batch</mat-label>
+          <input matInput formControlName="batch" placeholder="Enter batch">
+        </mat-form-field>
+      </div>
+  
+      <button mat-raised-button color="primary" type="submit">Submit</button>
+    </form>
+  </mat-card>
+  

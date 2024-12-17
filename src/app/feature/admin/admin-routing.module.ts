@@ -5,17 +5,47 @@ import { authGuard } from '../../core/guards/auth/auth.guard';
 
 
 const routes: Routes = [
-  {path :'', redirectTo:'dashboard', pathMatch : 'full'},
-  
-  {path : 'dashboard' , component : DashboardComponent , canActivate :[authGuard] }
+  // {path :'', redirectTo:'dashboard', pathMatch : 'full'},
+
+  { 
+    path: '', 
+    component: DashboardComponent, 
+    canActivate: [authGuard],
+    children: [
+      // Define child routes here
+      { 
+        path: 'dashboard', 
+        loadComponent: () => import('../admin/components/dashboard-data/dashboard-data.component').then(c => c.DashboardDataComponent), 
+        canActivate: [authGuard] 
+      },
+      { 
+        path: 'adduser', 
+        loadComponent: () => import('../admin/components/add-user/add-user.component').then(c => c.AddUserComponent), 
+        canActivate: [authGuard] 
+      }
+    ]
+  }
 ];
 
 @NgModule({
-  
+
   imports: [RouterModule.forChild(routes)],
   exports: [RouterModule]
 })
 export class AdminRoutingModule {
 
 
- }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+

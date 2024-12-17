@@ -58,6 +58,7 @@ export class StorageService {
   }
 
   public saveUser(user: any): void {
+    debugger
     if (this.isBrowser()) {
       sessionStorage.removeItem(USER_KEY);
       sessionStorage.setItem(USER_KEY, JSON.stringify(user));
