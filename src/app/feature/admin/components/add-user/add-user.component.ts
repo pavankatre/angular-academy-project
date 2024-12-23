@@ -12,12 +12,12 @@
 
 
 
-  
+
 // }
 
 
 
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, signal } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { MatInputModule } from '@angular/material/input';
@@ -25,6 +25,12 @@ import { MatSelectModule } from '@angular/material/select';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
 import { ReactiveFormsModule } from '@angular/forms';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatIconModule } from '@angular/material/icon';
+import { MatNativeDateModule } from '@angular/material/core';
+import { MatDatepickerModule } from '@angular/material/datepicker'
+import { UserCostants } from '../../../../core/constants/UserConstants';
+import { StorageService } from '../../../../core/services/storage/storage.service';
 
 @Component({
   selector: 'app-add-user',
@@ -35,64 +41,99 @@ import { ReactiveFormsModule } from '@angular/forms';
     MatSelectModule,
     MatButtonModule,
     MatCardModule,
-    ReactiveFormsModule
+    ReactiveFormsModule,
+    MatFormFieldModule,
+    MatCardModule,
+    MatSelectModule,
+    MatIconModule,
+    MatNativeDateModule,
+    MatDatepickerModule
   ],
   templateUrl: './add-user.component.html',
   styleUrls: ['./add-user.component.scss']
 })
 export class AddUserComponent implements OnInit {
-  userForm: FormGroup;
-  userTypes = ['Admin', 'Trainee', 'Coordinator', 'Student'];
+  addUsers: FormGroup;
+  selectedFile: any = null;
+  maxDOB: Date ;
+ 
 
-  constructor(private fb: FormBuilder) {
-    this.userForm = this.fb.group({
+  selectedUserType = signal('')
+  userTypes = signal(UserCostants.userType);
+
+  qualifications = signal(UserCostants.userQualifications);
+
+  constructor(private fb: FormBuilder , private storageService : StorageService) {
+     this.maxDOB = new Date();
+// this.maxDOB = new Date(today.getFullYear() - 18, today.getMonth(), today.getDate());
+
+    this.addUsers = this.fb.group({
+      firstName: ['', Validators.compose([Validators.required, Validators.minLength(3)])],
+      middleName: [''],
+      lastName: ['', Validators.compose([Validators.required, Validators.minLength(3)])],
+      userEmail: ['', Validators.compose([Validators.required, Validators.email])],
       userType: ['', Validators.required],
-      name: ['', Validators.required],
-      email: ['', [Validators.required, Validators.email]],
-      // Additional fields will be added dynamically based on user type
-    });
+      userGender: ['', Validators.required],
+      userDOB: ['', Validators.required],
+      userQualification: ['', Validators.required],
+      mobileNumber: ['', Validators.compose([Validators.required, Validators.minLength(10), Validators.pattern('^[0-9]*$'), Validators.maxLength(10)])],
+      userAddress: ['', Validators.required],
+      userExperience: ['', Validators.required],
+      userProfilePhoto: ['', Validators.required],
+    })
   }
 
   ngOnInit(): void {
-    this.onChanges();
+    this.maxDOB = new Date();
   }
 
-  onChanges(): void {
-    this.userForm.get('userType')?.valueChanges.subscribe(value => {
-      this.updateFormFields(value);
-    });
+
+
+  onFileSelected(event: any): void {
+    this.selectedFile = event.target.files[0] ?? null;
+    this.addUsers.value.userProfilePhoto = this.selectedFile;
+    if(event.target.files[0]){
+      this.addUsers.get('userProfilePhoto')?.clearValidators();
+      this.addUsers.get('userProfilePhoto')?.updateValueAndValidity();
+    }
+
+
   }
+  saveUser() {
+    debugger
+    if (this.addUsers.valid) {
+    if(this.addUsers.value.userType==="Student"){
+    this.addUsers.value.userProfilePhoto="";
+    this.addUsers.value.userExperience="";    }
+      console.log(this.addUsers.value)
+      const loginID =this.storageService.getUser().email;
+      console.log(loginID);
+      this.addUsers.value.addedBy = loginID;
+      this.storageService.addUser(this.addUsers.value);
+    }
+  }
+  onUserTypeSelected(event: any) {
 
-  updateFormFields(userType: string): void {
-    // Remove all additional controls before adding new ones
-    const controlsToRemove = ['department', 'course', 'batch'];
-    controlsToRemove.forEach(control => {
-      if (this.userForm.contains(control)) {
-        this.userForm.removeControl(control);
-      }
-    });
-
-    // Add controls based on selected user type
-    switch (userType) {
-      case 'Admin':
-        this.userForm.addControl('department', this.fb.control('', Validators.required));
-        break;
-      case 'Trainee':
-        this.userForm.addControl('course', this.fb.control('', Validators.required));
-        break;
-      case 'Coordinator':
-        this.userForm.addControl('batch', this.fb.control('', Validators.required));
-        break;
-      case 'Student':
-        this.userForm.addControl('course', this.fb.control('', Validators.required));
-        this.userForm.addControl('batch', this.fb.control('', Validators.required));
-        break;
-      default:
-        break;
+    this.selectedUserType.set(event.value);
+    const userExperienceControl = this.addUsers.get('userExperience');
+    const userProfilePhotoControl = this.addUsers.get('userProfilePhoto');
+    if (event.value === 'Student') {
+      userExperienceControl?.clearValidators();
+      userExperienceControl?.updateValueAndValidity();
+      userProfilePhotoControl?.clearValidators();
+      userProfilePhotoControl?.updateValueAndValidity();
+    }
+    else {
+      userExperienceControl?.setValidators([Validators.required]);
+      userExperienceControl?.updateValueAndValidity();
+      userProfilePhotoControl?.setValidators([Validators.required]);
+      userProfilePhotoControl?.updateValueAndValidity();
     }
   }
 
-  onSubmit(): void {
-    console.log(this.userForm.value);
+  resteUserForm() {
+    this.addUsers.reset()
+
+
   }
 }

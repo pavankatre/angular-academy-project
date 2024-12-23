@@ -1,13 +1,15 @@
 import { CommonModule } from '@angular/common';
-import { Component, computed, signal } from '@angular/core';
+import { Component, computed, inject, signal } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { RouterLink, RouterLinkActive, RouterModule, RouterOutlet } from '@angular/router';
 import {MatIconModule } from '@angular/material/icon';
-import { MatSidenavModule } from '@angular/material/sidenav'
+import {  MatDrawerMode, MatSidenavModule } from '@angular/material/sidenav'
 import { MenuItems } from '../../../../core/models/interfaces/IMenuItems';
 import { MatListModule } from '@angular/material/list';
 import { AddUserComponent } from '../add-user/add-user.component';
+import { ResponsiveService } from '../../../../core/services/responsive/responsive.service';
+import { AdminConstents } from '../../../../core/constants/AdminConstents';
 
 
 @Component({
@@ -18,41 +20,25 @@ import { AddUserComponent } from '../add-user/add-user.component';
   styleUrl: './dashboard.component.scss'
 })
 export class DashboardComponent {
+  constructor(private responsivServ: ResponsiveService) {}
   openSidenav = false;
 collapsed = signal(false);
-  menuItems= signal<MenuItems[]>([
-    { icon: 'dashboard',
-      label : 'Dashboard',
-      route :'dashboard'},
+  menuItems= signal<MenuItems[]>(AdminConstents.menuItem);
 
-      { icon: 'how_to_reg',
-        label : 'Add User',
-        route :'adduser'}
-        ,
-
-      { icon: 'video_library',
-        label : 'Content',
-        route :'content'}
-        ,
-
-      { icon: 'analytics',
-        label : 'Analytics',
-        route :'analytics'}
-        ,
-
-        { icon: 'comment',
-          label : 'Comment',
-          route :'comment'}
-  ]);
-
-  sidenavWidth= computed(()=>this.collapsed()? '65px' : '250px')
-
-
-
-
- 
+  sidenavWidth= computed(()=>this.collapsed()? '65px' : '250px');
 
 toggleSidenav() {
   this.openSidenav = !this.openSidenav;
 }
+
+// responsivServ= inject(ResponsiveService);
+
+
+sidenavMode:any  = computed(()=>{
+  if(this.responsivServ.smallWidth()){
+  return 'over' ;
+  }
+  return 'side' ;
+  })
+
 }

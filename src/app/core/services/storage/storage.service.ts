@@ -40,6 +40,7 @@
 import { Injectable } from '@angular/core';
 
 const USER_KEY = 'auth-user';
+const ADDUSER_KEY = 'add_user';
 
 @Injectable({
   providedIn: 'root',
@@ -67,7 +68,7 @@ export class StorageService {
 
   public getUser(): any {
     if (this.isBrowser()) {
-      const user = localStorage.getItem(USER_KEY);
+      const user = sessionStorage.getItem(USER_KEY);
       return user ? JSON.parse(user) : null;
     }
     return null;
@@ -79,6 +80,10 @@ export class StorageService {
       return !!sessionStorage.getItem(USER_KEY);
     }
     return false;
+  }
+   
+  public addUser(userData : any){
+    sessionStorage.setItem(ADDUSER_KEY, JSON.stringify(userData));
   }
 }
 

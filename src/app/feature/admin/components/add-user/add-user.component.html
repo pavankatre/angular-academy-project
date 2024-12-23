@@ -1,44 +1,123 @@
+
+<form [formGroup]="addUsers" (ngSubmit)="saveUser()" >
 <mat-card>
-    <form [formGroup]="userForm" (ngSubmit)="onSubmit()">
-      <mat-form-field appearance="fill">
-        <mat-label>User Type</mat-label>
-        <mat-select formControlName="userType">
-          <mat-option *ngFor="let type of userTypes" [value]="type">{{ type }}</mat-option>
-        </mat-select>
-      </mat-form-field>
-  
-      <mat-form-field appearance="fill">
-        <mat-label>Name</mat-label>
-        <input matInput formControlName="name" placeholder="Enter name">
-      </mat-form-field>
-  
-      <mat-form-field appearance="fill">
-        <mat-label>Email</mat-label>
-        <input matInput formControlName="email" placeholder="Enter email">
-      </mat-form-field>
-  
-      <div *ngIf="userForm.get('department')">
-        <mat-form-field appearance="fill">
-          <mat-label>Department</mat-label>
-          <input matInput formControlName="department" placeholder="Enter department">
+  <mat-card-content>
+
+    <mat-form-field>
+      <mat-label>First Name</mat-label>
+      <input matInput #input formControlName="firstName" required>
+       @if( addUsers.get('firstName')?.hasError('required')){
+        <mat-error > 
+          First name is required
+        </mat-error>
+       }
+       @if(addUsers.controls['firstName'].errors?.['minlength']){
+        <mat-error > 
+          First name must be at least 3 characters long
+        </mat-error>
+       }
+    </mat-form-field>
+    <mat-form-field>
+      <mat-label>Middle Name</mat-label>
+      <input matInput formControlName="middleName">
+    </mat-form-field>
+
+    <mat-form-field>
+      <mat-label>Last Name</mat-label>
+      <input matInput formControlName="lastName" required>
+        @if(addUsers.get('lastName')?.hasError('required')){
+          <mat-error>Last name is required</mat-error>
+        }
+        @if(addUsers.get('lastName')?.hasError('minlength')){
+          <mat-error> Last name must be at least 3 characters long</mat-error>
+        }
+     
+    </mat-form-field>
+    <mat-form-field >
+       <mat-label>Gender</mat-label>
+        <mat-select  formControlName="userGender">
+           <mat-option value="male">Male</mat-option>
+           <mat-option value="female">Female</mat-option>
+           <mat-option value="other">Other</mat-option>
+          </mat-select>
+           @if(addUsers.get('userGender')?.hasError('required')){
+            <mat-error>Gender is required</mat-error>
+           }
         </mat-form-field>
-      </div>
-  
-      <div *ngIf="userForm.get('course')">
-        <mat-form-field appearance="fill">
-          <mat-label>Course</mat-label>
-          <input matInput formControlName="course" placeholder="Enter course">
+        <mat-form-field>
+          <mat-label>User Type</mat-label>
+          <mat-select formControlName="userType" (selectionChange)="onUserTypeSelected($event)" >
+            @for( type of userTypes(); track type ){
+              <mat-option [value]="type" >{{type}}</mat-option>
+              }
+          </mat-select>
+          @if(addUsers.get('userType')?.hasError('required')){
+            <mat-error>Select user type</mat-error>
+          }
         </mat-form-field>
-      </div>
-  
-      <div *ngIf="userForm.get('batch')">
-        <mat-form-field appearance="fill">
-          <mat-label>Batch</mat-label>
-          <input matInput formControlName="batch" placeholder="Enter batch">
-        </mat-form-field>
-      </div>
-  
-      <button mat-raised-button color="primary" type="submit">Submit</button>
-    </form>
-  </mat-card>
-  
+         <mat-form-field>
+      <mat-label>Email</mat-label>
+      <input matInput formControlName="userEmail">
+    </mat-form-field>
+    <mat-form-field>
+      <mat-label>Date of Birth</mat-label>
+      <input matInput [max]="maxDOB" [matDatepicker]="picker" formControlName="userDOB" readonly>
+      <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+      <mat-datepicker #picker></mat-datepicker>
+      <mat-hint>mm/dd/yyyy</mat-hint>
+    </mat-form-field>
+    <mat-form-field>
+      <mat-label>Highest Qualification</mat-label>
+      <mat-select formControlName="userQualification" >
+        @for( qualification of qualifications(); track qualification ){
+        <mat-option [value]="qualification">{{qualification}}</mat-option>
+        }
+      </mat-select>
+    </mat-form-field>
+    <mat-form-field>
+      <mat-label>Mobile Number</mat-label>
+      <input matInput formControlName="mobileNumber" >
+      @if(addUsers.get('mobileNumber')?.hasError('required')){
+        <mat-error>Mobile number is required</mat-error>
+      }
+      @if(addUsers.get('mobileNumber')?.hasError('pattern')){
+        <mat-error>Please enter valid mobile number</mat-error>
+      }
+      @if(addUsers.get('mobileNumber')?.hasError('minlength') || addUsers.get('mobileNumber')?.hasError('maxlength')){
+        <mat-error>Mobile number should be 10 digit</mat-error>
+      }
+    </mat-form-field>
+    <mat-form-field>
+      <mat-label>Address</mat-label>
+      <textarea matInput formControlName="userAddress" required></textarea>
+      @if(addUsers.get('userAddress')?.hasError('required')){
+<mat-error>
+  Address is required
+</mat-error>
+      }
+    </mat-form-field>
+    @if(selectedUserType()!='Student'){
+<mat-form-field > 
+  <mat-label>Experience</mat-label> 
+  <textarea matInput formControlName="userExperience" ></textarea> 
+  @if(addUsers.get('userExperience')?.hasError('required')){
+    <mat-error>Experience is required</mat-error>
+  }
+</mat-form-field>
+<mat-form-field>
+  <mat-label>Profile Photo</mat-label>
+  <input  matInput [value]="selectedFile?.name" formControlName="userProfilePhoto" >
+  <button type="button" mat-raised-button (click)="fileInput.click()">Choose File</button>
+<input hidden   (change)="onFileSelected($event)" #fileInput type="file">
+<span class="file-name">{{selectedFile?.name}}</span>
+</mat-form-field>
+    }
+  </mat-card-content>
+  <mat-card-footer>
+    <div>
+      <button mat-raised-button color="primary" type="submit">Save</button>
+      <button color="warn" mat-raised-button (click)="resteUserForm()"> Clear</button>
+    </div>
+  </mat-card-footer>
+</mat-card>
+</form>
